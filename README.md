@@ -44,6 +44,10 @@
     
 ![image](images/ddns5.png)
 
+    根据名称填写相对应参数, 建议使用子域名
+
+![image](images/ddns7.png)
+
 ## 4、运行
     
     右键任务选择 运行 进行测试
