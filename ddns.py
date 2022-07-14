@@ -1,4 +1,5 @@
 import requests
+import logging
 
 
 class ChangeDomain():
@@ -11,6 +12,7 @@ class ChangeDomain():
         response = requests.get(url=url).json()
         if response['code'] == 'querySuccess':
             return response['IP']
+        logging.warning('未获取到ipv4地址.')
         return None
 
     def getIpv6(self):
@@ -18,6 +20,7 @@ class ChangeDomain():
         response = requests.get(url=url).json()
         if response['code'] == 'querySuccess':
             return response['IP']
+        logging.warning('未获取到ipv6地址.')
         return None
 
     def getRecords(self):
@@ -31,6 +34,7 @@ class ChangeDomain():
         response = requests.post(url=url, data=data).json()
         if response['status']['code'] == '1':
             return response['records']
+        logging.warning('未获取到解析列表.')
         return None
 
     def changeRecord(self,record, ip):
@@ -48,16 +52,16 @@ class ChangeDomain():
         }
         response = requests.post(url=url,data=data).json()
         if response['status']['code'] == '1':
-            print('[INFO]： 当前域名: {}.{},value: {},修改完成.'.format(record['name'],self.domain,ip))
+            logging.info('当前域名: {}.{}, 记录: {},修改完成.'.format(record['name'],self.domain,ip))
             return
-        print('[WARN]: 修改失败：{}'.format(response))
+        logging.warning('修改失败：{}.'.format(response))
 
     def changeRecordList(self):
         ipv4 = self.getIpv4()
         ipv6 = self.getIpv6()
         records = self.getRecords()
         if records is None:
-            print('[ERROR]： 获取解析列表失败')
+            logging.error('获取解析列表失败.')
             Exception(RuntimeError)
         #   ipv4不为空
         if ipv4 is not None:
@@ -65,13 +69,13 @@ class ChangeDomain():
                 if self.sub_domain is None:
                     if record['status'] == 'enable' and record['type'] == 'A' and record['name'] == '@':
                         if record['value'] == ipv4:
-                            print('[INFO]: 记录值:{},当前值:{} 存在该记录值,不需要修改.'.format(record['value'], ipv4))
+                            logging.info('记录值:{},当前值:{} 存在该记录值,不需要修改.'.format(record['value'], ipv4))
                         else:
                             self.changeRecord(record, ipv4)
                 else:
                     if record['status'] == 'enable' and record['type'] == 'A' and record['name'] == self.sub_domain:
                         if record['value'] == ipv4:
-                            print('[INFO]: 记录值:{},当前值:{} 存在该记录值,不需要修改.'.format(record['value'], ipv4))
+                            logging.info('记录值:{},当前值:{} 存在该记录值,不需要修改.'.format(record['value'], ipv4))
                         else:
                             self.changeRecord(record, ipv4)
 
@@ -81,24 +85,22 @@ class ChangeDomain():
                 if self.sub_domain is None:
                     if record['status'] == 'enable' and record['type'] == 'AAAA' and record['name'] == '@':
                         if record['value'] == ipv6:
-                            print('[INFO]: 记录值:{},当前值:{} 存在该记录值,不需要修改.'.format(record['value'], ipv6))
+                            logging.info('记录值:{},当前值:{} 存在该记录值,不需要修改.'.format(record['value'], ipv6))
                         else:
                             self.changeRecord(record, ipv6)
                 else:
                     if record['status'] == 'enable' and record['type'] == 'AAAA' and record['name'] == self.sub_domain:
                         if record['value'] == ipv6:
-                            print('[INFO]: 记录值:{},当前值:{} 存在该记录值,不需要修改.'.format(record['value'], ipv6))
+                            logging.info('记录值:{},当前值:{} 存在该记录值,不需要修改.'.format(record['value'], ipv6))
                         else:
                             self.changeRecord(record, ipv6)
 
-        print('[INFO]: 运行结束.')
+        logging.info('运行结束.')
 
     def __init__(self, id, token, domain, sub_domain):
         #   根据dnspod需求拼接token字符串
         self.token = id + ',' + token
-
         self.domain = domain
-
         if sub_domain == '':
             self.sub_domain = None
         else:
@@ -117,4 +119,15 @@ if __name__ == '__main__':
     #   子域名
     sub_domain = ''
 
+
+    #   日志配置
+    logging.basicConfig(filename='ddns.log',
+                        level=logging.INFO,
+                        datefmt='%m,%d,%Y %H:%M:%S',
+                        encoding='utf-8',
+                        format='%(asctime)s|%(levelname)s|%(message)s')
+    #   启动
+    logging.info('运行开始.')
     ChangeDomain(id, token, domain, sub_domain)
+
+
