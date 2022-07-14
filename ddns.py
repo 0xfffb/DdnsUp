@@ -1,6 +1,6 @@
 import requests
 import logging
-
+import sys
 
 class ChangeDomain():
     token = None
@@ -98,6 +98,7 @@ class ChangeDomain():
         logging.info('运行结束.')
 
     def __init__(self, id, token, domain, sub_domain):
+        logging.info('运行开始.')
         #   根据dnspod需求拼接token字符串
         self.token = id + ',' + token
         self.domain = domain
@@ -109,6 +110,16 @@ class ChangeDomain():
         self.changeRecordList()
 
 
+def setUpLogging(path):
+    if path is None:
+        path = 'ddns.log'
+
+    log = logging.getLogger()
+    log.setLevel(logging.INFO)
+    handler = logging.FileHandler(filename=path, encoding='utf-8')
+    handler.setFormatter(logging.Formatter('%(asctime)s|%(levelname)s|%(message)s'))
+    log.addHandler(handler)
+
 if __name__ == '__main__':
     #   ID
     id = 'id'
@@ -119,15 +130,10 @@ if __name__ == '__main__':
     #   子域名
     sub_domain = ''
 
+    #   日志配置,兼容Python 3.9以下版本
+    setUpLogging(sys.argv[1])
 
-    #   日志配置
-    logging.basicConfig(filename='ddns.log',
-                        level=logging.INFO,
-                        datefmt='%m,%d,%Y %H:%M:%S',
-                        encoding='utf-8',
-                        format='%(asctime)s|%(levelname)s|%(message)s')
     #   启动
-    logging.info('运行开始.')
     ChangeDomain(id, token, domain, sub_domain)
 
 
