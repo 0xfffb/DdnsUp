@@ -5,20 +5,33 @@
     使用dnspod官方教程获取Token和Id
     https://docs.dnspod.cn/account/dnspod-token/
 ## 2、下载依赖
-使用ssh工具进入群晖或其他nas系统输入：
 
-    pip3 install requests
+开启ssh:
 
-根据自己python版本选择pip,群晖系统需要另外安装pip
+![image](images/ddns8.png)
+
+使用ssh工具进行链接：
+
+    这里我使用的是windows10自带的cmd
+    ssh user@ip
+    user为你账户名
+    回车后输入你的密码
+
+![image](images/ddns9.png)
 
 群晖安装命令：
-
+    
+    注意：执行命令后会让你输入密码,密码就是你的账户密码.
     sudo python -m ensurepip
     sudo python -m pip install --upgrade pip
 
 执行完毕检查版本：
 
     sudo pip -V
+
+使用pip安装依赖
+    
+    sudo pip install requests
     
 ## 3、下载脚本并填写对应参数
     下载 ddns.py 放入nas中
